@@ -4,7 +4,6 @@ import com.myproject.crudapp.exception.BookDAOException;
 import com.myproject.crudapp.model.Book;
 import com.myproject.crudapp.utils.JDBCUtils;
 
-import java.awt.image.RescaleOp;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -13,25 +12,26 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BookDAOImpl implements BookDAO{
-    private static final String INSERT_SQL ="INSERT INTO book(title,author,category,price) VALUES (?,?,?,?))";
-    private static final String DELETE_SQL ="DELETE FROM book WHERE id=?";
-    private static final String UPDATE_SQL ="UPDATE book SET title=?,author=?,category=?,price=? WHERE id=?";
-    private static final String GET_BY_ID_SQL ="SELECT * FROM book WHERE id=?";
-    private static final String GET_ALL_SQL ="SELECT * FROM book";
+    private static final String INSERT_SQL ="INSERT INTO books(title,author,category,price) VALUES (?,?,?,?)";
+    private static final String DELETE_SQL ="DELETE FROM books WHERE id=?";
+    private static final String UPDATE_SQL ="UPDATE books SET title=?,author=?,category=?,price=? WHERE id=?";
+    private static final String GET_BY_ID_SQL ="SELECT * FROM books WHERE id=?";
+    private static final String GET_ALL_SQL ="SELECT * FROM books";
 
     @Override
     public void insert(Book book) {
         try(Connection connection = JDBCUtils.getConnection();
             PreparedStatement statement = connection.prepareStatement(INSERT_SQL)){
+
             statement.setString(1,book.getTitle());
             statement.setString(2, book.getAuthor());
             statement.setString(3, book.getCategory());
-            statement.setDouble(4,book.getId());
+            statement.setDouble(4,book.getPrice());
 
             statement.executeUpdate();
 
         } catch (SQLException sqle) {
-            throw new BookDAOException("Unable to Insert Record",sqle);
+            throw new BookDAOException("Unable to Insert Record"+sqle,sqle);
         }
     }
 
@@ -68,7 +68,7 @@ public class BookDAOImpl implements BookDAO{
     public Book getBookById(int id) {
         Book book = null;
         try(Connection connection = JDBCUtils.getConnection();
-            PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)){
+            PreparedStatement statement = connection.prepareStatement(GET_BY_ID_SQL)){
             statement.setInt(1,id);
             try(ResultSet rs = statement.executeQuery()){
                 if(rs.next()){
@@ -91,7 +91,7 @@ public class BookDAOImpl implements BookDAO{
     public List<Book> getAllBooks() {
         List<Book> bookList = new ArrayList<>();
         try(Connection connection = JDBCUtils.getConnection();
-            PreparedStatement statement = connection.prepareStatement(UPDATE_SQL);
+            PreparedStatement statement = connection.prepareStatement(GET_ALL_SQL);
             ResultSet rs = statement.executeQuery()){
                 while(rs.next()){
                    bookList.add(new Book(
@@ -103,7 +103,7 @@ public class BookDAOImpl implements BookDAO{
                    );
                 }
         } catch (SQLException sqle) {
-            throw new BookDAOException("Unable to Fetch Single Record",sqle);
+            throw new BookDAOException("Unable to Fetch Records"+sqle,sqle);
         }
         return bookList;
     }

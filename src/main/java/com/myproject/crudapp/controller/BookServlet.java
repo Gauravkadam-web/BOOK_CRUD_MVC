@@ -1,6 +1,8 @@
 package com.myproject.crudapp.controller;
 
 import com.myproject.crudapp.dao.BookDAO;
+import com.myproject.crudapp.dao.BookDAOHibernate;
+import com.myproject.crudapp.dao.BookDAOHibernateImpl;
 import com.myproject.crudapp.dao.BookDAOImpl;
 import com.myproject.crudapp.exception.BookDAOException;
 import com.myproject.crudapp.model.Book;
@@ -14,13 +16,16 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.ClientInfoStatus;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @WebServlet(urlPatterns = {"/books","/"})
 public class BookServlet extends HttpServlet {
-    BookDAO bookDao = null;
+//    BookDAO bookDao = null;
+    BookDAOHibernate bookDao = null;
     @Override
     public void init(ServletConfig config) throws ServletException {
-        bookDao =new BookDAOImpl();
+//      bookDao =new BookDAOImpl();
+        bookDao = new BookDAOHibernateImpl();
     }
 
     @Override
@@ -64,22 +69,57 @@ public class BookServlet extends HttpServlet {
     }
 
     private void insertBook(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String title = request.getParameter("title");
-        String author = request.getParameter("author");
-        String category = request.getParameter("category");
-        double price = Double.parseDouble(request.getParameter("price"));
+        String title = null;
+        String author = null;
+        String category = null;
+        double price = 0.0;
 
+        boolean ans = true;
+        try {
+            title = request.getParameter("title");
+            author = request.getParameter("author");
+            category = request.getParameter("category");
+            price = Double.parseDouble(request.getParameter("price"));
+
+            ans = validate(request,title,author,category,price);
+
+        } catch(Exception e){
+            ans = false;
+        }
+
+        if(!ans){
+            request.getRequestDispatcher("Book-form.jsp").forward(request,response);
+            return;
+        }
         bookDao.insert(new Book(title,author,category,price));
         request.getRequestDispatcher("books?action=list&success=Inserted Successfully").forward(request,response);
     }
 
 
     private void UpdateBook(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        String title = request.getParameter("title");
-        String author = request.getParameter("author");
-        String category = request.getParameter("category");
-        double price = Double.parseDouble(request.getParameter("price"));
+        int id = 0;
+        String title = null;
+        String author = null;
+        String category = null;
+        double price = 0.0;
+         boolean ans = true;
+         try {
+              id = Integer.parseInt(request.getParameter("id"));
+             title = request.getParameter("title");
+             author = request.getParameter("author");
+             category = request.getParameter("category");
+             price = Double.parseDouble(request.getParameter("price"));
+
+             ans = validate(request,title,author,category,price);
+         } catch (Exception e) {
+             ans = false;
+         }
+        if(!ans){
+            request.setAttribute("book",new Book(id,title,author,category,price));
+            request.getRequestDispatcher("Book-form.jsp").forward(request,response);
+            return;
+        }
+
         bookDao.update(new Book(id,title,author,category,price));
         request.getRequestDispatcher("books?action=list&success=Updated Successfully").forward(request,response);
     }
@@ -93,6 +133,29 @@ public class BookServlet extends HttpServlet {
 
     private void showNewForm(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.getRequestDispatcher("Book-form.jsp").forward(request,response);
+    }
+
+    private boolean validate(HttpServletRequest request,String title,String author,String category,double price) throws NumberFormatException{
+        boolean isValid = true;
+            if(title == null || !Pattern.matches("^[A-Za-z ]{3,25}$",title.trim())){
+                isValid = false;
+                request.setAttribute("titleError","Title must be at least 3 characters long.");
+            }
+            if(author == null || !Pattern.matches("^[A-Za-z. ]{3,25}$",author.trim())){
+                isValid = false;
+                request.setAttribute("authorError","Author Should be AtLeast 3-20 character ");
+
+            }
+            if(category == null || !Pattern.matches("^[A-Za-z ]{3,25}$",category.trim())){
+                isValid = false;
+                request.setAttribute("categoryError","Category Should be AtLeast 3-20 character ");
+
+            }
+            if (Double.isNaN(price) || price <= 0) {
+                isValid = false;
+                request.setAttribute("priceError","Price Should be Non-Negative");
+            }
+        return isValid;
     }
 
 }

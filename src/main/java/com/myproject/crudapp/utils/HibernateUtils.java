@@ -1,6 +1,8 @@
 package com.myproject.crudapp.utils;
 
+import com.myproject.crudapp.auth.model.Users;
 import com.myproject.crudapp.exception.BookDAOException;
+import com.myproject.crudapp.model.Book;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 

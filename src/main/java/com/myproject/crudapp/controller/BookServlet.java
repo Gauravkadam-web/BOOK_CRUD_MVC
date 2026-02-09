@@ -18,7 +18,7 @@ import java.sql.ClientInfoStatus;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@WebServlet(urlPatterns = {"/books","/"})
+@WebServlet("/book")
 public class BookServlet extends HttpServlet {
 //    BookDAO bookDao = null;
     BookDAOHibernate bookDao = null;
@@ -65,7 +65,7 @@ public class BookServlet extends HttpServlet {
     private void deleteBook(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int id = Integer.parseInt(request.getParameter("id"));
         bookDao.delete(id);
-        request.getRequestDispatcher("books?action=list&success=Deleted Successfully").forward(request,response);
+        request.getRequestDispatcher("book?action=list&success=Deleted Successfully").forward(request,response);
     }
 
     private void insertBook(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -92,7 +92,7 @@ public class BookServlet extends HttpServlet {
             return;
         }
         bookDao.insert(new Book(title,author,category,price));
-        request.getRequestDispatcher("books?action=list&success=Inserted Successfully").forward(request,response);
+        request.getRequestDispatcher("book?action=list&success=Inserted Successfully").forward(request,response);
     }
 
 
@@ -121,7 +121,7 @@ public class BookServlet extends HttpServlet {
         }
 
         bookDao.update(new Book(id,title,author,category,price));
-        request.getRequestDispatcher("books?action=list&success=Updated Successfully").forward(request,response);
+        request.getRequestDispatcher("book?action=list&success=Updated Successfully").forward(request,response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

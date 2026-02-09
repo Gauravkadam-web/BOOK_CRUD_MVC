@@ -15,7 +15,7 @@
 </head>
 
 <body class="bg-light">
-
+<%@ include file="header.jsp" %>
 <%
     Book book = (Book) request.getAttribute("book");
     boolean isEdit = (book != null);
@@ -133,5 +133,7 @@
 
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+<%@ include file="footer.jsp" %>
 </body>
 </html>

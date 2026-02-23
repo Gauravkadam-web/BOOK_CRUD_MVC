@@ -6,6 +6,7 @@ import com.myproject.crudapp.dao.BookDAOHibernateImpl;
 import com.myproject.crudapp.dao.BookDAOImpl;
 import com.myproject.crudapp.exception.BookDAOException;
 import com.myproject.crudapp.model.Book;
+import com.myproject.crudapp.model.Pagination;
 import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,12 +21,12 @@ import java.util.regex.Pattern;
 
 @WebServlet("/book")
 public class BookServlet extends HttpServlet {
-//    BookDAO bookDao = null;
-    BookDAOHibernate bookDao = null;
+    BookDAO bookDao = null;
+//    BookDAOHibernate bookDao = null;
     @Override
     public void init(ServletConfig config) throws ServletException {
-//      bookDao =new BookDAOImpl();
-        bookDao = new BookDAOHibernateImpl();
+      bookDao =new BookDAOImpl();
+//        bookDao = new BookDAOHibernateImpl();
     }
 
     @Override
@@ -58,8 +59,33 @@ public class BookServlet extends HttpServlet {
 
     }
     private void listBooks(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Book> bookList = bookDao.getAllBooks();
+        int page = 1; //default page
+        int pageSize = 5;   //default page size
+
+        if(request.getParameter("page")!=null)
+            page = Integer.parseInt(request.getParameter("page"));
+        if(request.getParameter("pageSize")!=null)
+            pageSize = Integer.parseInt(request.getParameter("pageSize"));
+
+        Pagination pagination = new Pagination(page,pageSize);
+
+        int totalRecords = bookDao.countBooks();
+        int totalPages = (int)Math.ceil((double) totalRecords / pageSize);
+
+        if(page<1)
+            page = 1;
+        if(page>totalPages)
+            page = totalPages;
+
+        pagination.setPage(page);
+
+        List<Book> bookList = bookDao.getSelectedBooks(pagination);
+
         request.setAttribute("books",bookList);
+        request.setAttribute("totalPages",totalPages);
+        request.setAttribute("currentPage",page);
+        request.setAttribute("pageSize",pageSize);
+
         request.getRequestDispatcher("Book-list.jsp").forward(request,response);
     }
     private void deleteBook(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

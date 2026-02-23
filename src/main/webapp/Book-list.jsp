@@ -54,7 +54,6 @@
     <!-- Table Card -->
     <div class="card border-0 shadow-sm rounded-4">
         <div class="card-body p-0">
-
             <table class="table table-hover align-middle mb-0">
                 <thead class="table-primary text-center">
                     <tr>
@@ -120,7 +119,85 @@
             </table>
         </div>
     </div>
+<%
+    int totalPages = (int)request.getAttribute("totalPages");
+    int currentPage = (int)request.getAttribute("currentPage");
+    int pageSize = (int)request.getAttribute("pageSize");
+%>
 
+<div class="d-flex mt-3 align-item-center justify-content-between">
+
+    <form action="book" method="POST" class="d-flex align-item-center">
+        <span class="text-muted me-2 ">Show</span>
+        <select name="pageSize" class="form-select form-select-sm me-2" style="width:70px;" onchange="this.form.submit()">
+            <option value="5" <%= (pageSize == 5 ? "selected" : "") %>>5</option>
+            <option value="10" <%= (pageSize == 10 ? "selected" : "") %>>10</option>
+            <option value="15" <%= (pageSize == 15 ? "selected" : "") %>>15</option>
+            <option value="20" <%= (pageSize == 20 ? "selected" : "") %>>20</option>
+            <option value="25" <%= (pageSize == 25 ? "selected" : "") %>>25</option>
+            <option value="50" <%= (pageSize == 50 ? "selected" : "") %>>50</option>
+            <option value="50" <%= (pageSize == 75 ? "selected" : "") %>>75</option>
+            <option value="50" <%= (pageSize == 100 ? "selected" : "") %>>100</option>
+        </select>
+        <span class="text-muted">Entries</span>
+    </form>
+
+    <form action="book" method="POST" class="d-flex align-item-center">
+        <span class="text-muted me-2">Go to</span>
+        <input type="hidden" name="pageSize" value="<%=pageSize%>"/>
+        <input type="number" name="page"
+            class="form-control form-control-sm me-2"
+            min=1
+            max=<%=totalPages%>
+            style="width:70px;">
+        <button class="btn btn-primary btn-sm">GO</button>
+    </form>
+
+</div>
+
+    <% if( totalPages > 1) { %>
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+
+            <!--First-->
+            <li class="page-item <%= (currentPage==1)? "disabled" : "" %>">
+                <a class="page-link" href="book?page=1&pageSize=<%=pageSize%>">
+                    <i class="fa-solid fa-backward-fast"></i>
+                </a>
+            </li>
+
+            <!--Previous-->
+            <li class="page-item <%= (currentPage==1)? "disabled" : "" %>">
+                <a class="page-link" href="book?page=<%= currentPage-1 %>&pageSize=<%=pageSize%>">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </a>
+            </li>
+
+            <!--Display-->
+            <% for(int i=1 ; i<=totalPages ; i++) { %>
+                <li class="page-item <%= (i==currentPage)? "active" : "" %>">
+                    <a class="page-link" href="book?page=<%=i%>&pageSize=<%=pageSize%>">
+                        <%=i%>
+                    </a>
+                </li>
+            <% } %>
+
+            <!--Next-->
+            <li class="page-item  <%= (currentPage==totalPages)? "disabled" : "" %>">
+                <a class="page-link" href="book?page=<%= currentPage+1 %>&pageSize=<%=pageSize%>">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </a>
+            </li>
+
+            <!--Last-->
+            <li class="page-item  <%= (currentPage==totalPages)? "disabled" : "" %>">
+                <a class="page-link" href="book?page=<%= totalPages %>&pageSize=<%=pageSize%>">
+                    <i class="fa-solid fa-forward-fast"></i>
+                </a>
+            </li>
+          </ul>
+        </nav>
+    <% } %>
 </div>
 
 <!-- Bootstrap JS -->

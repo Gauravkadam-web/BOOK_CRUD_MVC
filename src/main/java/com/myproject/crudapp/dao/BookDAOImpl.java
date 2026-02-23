@@ -2,6 +2,7 @@ package com.myproject.crudapp.dao;
 
 import com.myproject.crudapp.exception.BookDAOException;
 import com.myproject.crudapp.model.Book;
+import com.myproject.crudapp.model.Pagination;
 import com.myproject.crudapp.utils.JDBCUtils;
 
 import java.sql.Connection;
@@ -16,7 +17,10 @@ public class BookDAOImpl implements BookDAO{
     private static final String DELETE_SQL ="DELETE FROM books WHERE id=?";
     private static final String UPDATE_SQL ="UPDATE books SET title=?,author=?,category=?,price=? WHERE id=?";
     private static final String GET_BY_ID_SQL ="SELECT * FROM books WHERE id=?";
-    private static final String GET_ALL_SQL ="SELECT * FROM books";
+//    private static final String GET_ALL_SQL ="SELECT * FROM books";
+    private static final String BASE_SELECT_SQL ="SELECT id,title,author,category,price FROM books";
+    private static final String PAGINATION_SQL =" LIMIT ? OFFSET ?";
+    private static final String COUNT_SQL ="SELECT COUNT(*) FROM books";
 
     @Override
     public void insert(Book book) {
@@ -88,23 +92,47 @@ public class BookDAOImpl implements BookDAO{
     }
 
     @Override
-    public List<Book> getAllBooks() {
+    public List<Book> getSelectedBooks(Pagination pagination) {
         List<Book> bookList = new ArrayList<>();
+
+        //select * from books limit ? offset ?;
+        String sql = BASE_SELECT_SQL + PAGINATION_SQL;
+
         try(Connection connection = JDBCUtils.getConnection();
-            PreparedStatement statement = connection.prepareStatement(GET_ALL_SQL);
-            ResultSet rs = statement.executeQuery()){
-                while(rs.next()){
-                   bookList.add(new Book(
-                           rs.getInt("id"),
-                           rs.getString("title"),
-                           rs.getString("author"),
-                           rs.getString("category"),
-                           rs.getDouble("price"))
-                   );
+            PreparedStatement statement = connection.prepareStatement(sql)){
+
+            statement.setInt(1,pagination.getPageSize());   //limit
+            statement.setInt(2,pagination.getOffset());       //offset
+
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    bookList.add(new Book(
+                            rs.getInt("id"),
+                            rs.getString("title"),
+                            rs.getString("author"),
+                            rs.getString("category"),
+                            rs.getDouble("price"))
+                    );
                 }
+            }
         } catch (SQLException sqle) {
             throw new BookDAOException("Unable to Fetch Records"+sqle,sqle);
         }
         return bookList;
+    }
+
+    @Override
+    public int countBooks() {
+        try(Connection connection = JDBCUtils.getConnection();
+            PreparedStatement statement = connection.prepareStatement(COUNT_SQL);
+            ResultSet rs = statement.executeQuery()){
+
+            if(rs.next())
+                return rs.getInt(1);
+
+        }catch (SQLException sqle) {
+            throw new BookDAOException("Unable to Count Records"+sqle,sqle);
+        }
+        return 0;
     }
 }

@@ -10,13 +10,10 @@
             org.postgresql.Driver
         </property>
         <property name="hibernate.connection.url">
-            jdbc:postgresql://localhost:5432/bookdb1
+            jdbc:postgresql://postgres:5432/bookdb
         </property>
-        <property name="hibernate.connection.username">postgres</property>
-        <property name="hibernate.connection.password">1234</property>
-
-        <!-- REMOVE this line (Hibernate auto-detects it) -->
-        <!-- <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property> -->
+        <property name="hibernate.connection.username">gaurav</property>
+        <property name="hibernate.connection.password">password</property>
 
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="hibernate.show_sql">true</property>

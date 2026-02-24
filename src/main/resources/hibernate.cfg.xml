@@ -9,14 +9,13 @@
         <property name="hibernate.connection.driver_class">
             org.postgresql.Driver
         </property>
-        <property name="hibernate.connection.url">
-            jdbc:postgresql://postgres:5432/bookdb
+
+        <property name="hibernate.dialect">
+            org.hibernate.dialect.PostgreSQLDialect
         </property>
-        <property name="hibernate.connection.username">gaurav</property>
-        <property name="hibernate.connection.password">password</property>
 
         <property name="hibernate.hbm2ddl.auto">update</property>
-        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.show_sql">false</property>
         <property name="hibernate.format_sql">true</property>
 
         <mapping class="com.myproject.crudapp.auth.model.Users"/>

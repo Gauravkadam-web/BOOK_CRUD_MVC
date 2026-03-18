@@ -202,7 +202,7 @@
                 <div class="text-center mt-4 small">
                     <span class="text-muted">
                         <i class="bi bi-person-plus me-1"></i>
-                        Don’t have an account?
+                        Dont have an account?
                     </span>
                     <a href="auth?action=register"
                        class="fw-semibold text-decoration-none ms-1 text-primary">

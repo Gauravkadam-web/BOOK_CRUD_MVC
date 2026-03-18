@@ -179,7 +179,7 @@ body::after {
         padding: 4px 7px;
     }
 
-} 
+}
 
     </style>
 </head>
